@@ -1,7 +1,6 @@
-<form action="https://api.emailclogs.com/Clog/Send" method="post" target="_blank"> style="display:grid; gap:8px; max-width:520px;">
+<form action="https://api.emailclogs.com/Clog/Send" method="post" target="_blank" style="display:grid; gap:8px; max-width:520px;">
 
-
- <label style="font-weight:600;">First Name
+  <label style="font-weight:600;">First Name
     <input type="text" name="firstName" value="--A--first_name--B--"
            style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px;" required>
   </label>
@@ -20,17 +19,16 @@
   <input type="hidden" id="pkgCode" name="packageCode" value="">
 
   <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:6px;">
-<input type="submit"
-       onclick="document.getElementById('pkgCode').value='CAL'; alert('Email Successfully Sent!');"
-       value="SEND $196 CAL CLOG">
+    <input type="submit"
+           onclick="document.getElementById('pkgCode').value='CAL'; alert('Email Successfully Sent!');"
+           value="SEND $196 CAL CLOG">
 
-<input type="submit"
-       onclick="document.getElementById('pkgCode').value='IML'; alert('Email Successfully Sent!');"
-       value="SEND $396 IML CLOG">
-
+    <input type="submit"
+           onclick="document.getElementById('pkgCode').value='IML'; alert('Email Successfully Sent!');"
+           value="SEND $396 IML CLOG">
   </div>
-
 </form>
+
 
 
 
