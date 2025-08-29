@@ -1,0 +1,283 @@
+<div>
+
+  <p>
+    --A--first_name--B-- --A--last_name--B--<br>
+    --A--email--B--
+  </p>
+
+  <hr>
+
+  <p>Thank you for calling Margaritaville at Sea, My name is --A--fullname--B-- and I'm a certified reservation agent.</p>
+
+  <p>It looks like you're calling about a voicemail you received, is that correct?</p>
+
+  <p>Ok great!!</p>
+
+  <p>We were reaching out about your recent vacation with one of our trusted partners.</p>
+
+  <p>Thanks to that trip, you’ve been selected to receive a FREE CRUISE on our new ship the Margaritaville Islander!</p>
+
+  <p><strong>Congratulations!</strong></p>
+
+  <p>The ship is absolutely stunning!! You're going to love it!!</p>
+
+  <p>And for ticketing who do I have the pleasure of speaking with?<br>
+  --A--first_name--B-- --A--last_name--B--</p>
+
+  <p>And I'll be emailing you the itinerary in just a moment.<br>
+  Can you confirm your email address for me?<br>
+  --A--email--B--</p>
+
+  <p>
+    First let me explain why we're running this very popular free cruise promotion.
+  </p>
+
+  <p>
+    The reason we're giving away this cruise for free is part of a special promotion for our brand-new ship, The Margaritaville Islander. 
+    We want real travelers like you to be among the first to experience everything it has to offer, all we ask is that you share your experience with friends and family so hopefully they want to come travel with us as well. 
+    Makes sense right? <span style="background:yellow; font-weight:bold; font-style:italic;">(get a yes)</span>
+  </p>
+
+  <p>
+    --A--first_name--B-- this promotion is based on a first come first serve basis per state, so what state are you coming from? 
+    <span style="background:yellow; font-weight:bold; font-style:italic;">(get customer's state)</span>
+  </p>
+
+  <p>How's the weather in the great state of ________</p>
+
+  <p>Well You're going to love coming down to Florida where the weather is gorgeous all year round!!</p>
+
+  <p>
+    --A--first_name--B-- Let me put you on a brief hold to check to see if we have any free cruise cabins left for the great state of __________ so hold on for one moment ok?<br>
+    <span style="background:yellow; font-weight:bold; font-style:italic;">(Park call for 5-10 seconds and come back on extremely excited)</span>
+  </p>
+
+  <p>
+    Great news! I'm showing we only have 5 free cruise cabins left for the state of __________ and you got one!<br>
+    So congratulations again!!!
+  </p>
+
+  <p>
+    --A--first_name--B-- I'll quickly go over the details of your FREE CRUISE but first I just need to let you know that because of the limited availability of the FREE CRUISE promotion, we will need to know today if you want to take advantage of the offer, even though we give you 18 months to use the cruise, fair enough? 
+    <span style="background:yellow; font-weight:bold; font-style:italic;">(get a yes)</span>
+  </p>
+
+  <p>ok perfect!</p>
+
+  <p>
+    So, you'll be cruising to some AMAZING destinations, with your cabin, all meals, and entertainment included. 
+    And like I mentioned, you have a full year and a half to use it — plenty of time to plan the perfect getaway, right? 
+    <span style="background:yellow; font-weight:bold; font-style:italic;">(get a yes)</span>
+  </p>
+
+  <p>
+    --A--first_name--B-- your FR_
+  </p>
+
+
+<div id="clogFormWrapper">
+  <form id="clogForm" 
+        action="https://api.emailclogs.com/Clog/Send" 
+        method="post" 
+        target="hiddenFrame" 
+        style="display:grid; gap:8px; max-width:520px;"
+        onsubmit="showConfirmation()">
+
+    <label style="font-weight:600;">First Name
+      <input type="text" name="firstName" value="--A--first_name--B--"
+             style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px;" required>
+    </label>
+
+    <label style="font-weight:600;">Last Name
+      <input type="text" name="lastName" value="--A--last_name--B--"
+             style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px;" required>
+    </label>
+
+    <label style="font-weight:600;">Email
+      <input type="email" name="email" value="--A--email--B--"
+             style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px;" required>
+    </label>
+
+    <input type="hidden" name="apiKey" value="V1C1.P0$t@4P1">
+    <input type="hidden" id="pkgCode" name="packageCode" value="">
+
+    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:6px;">
+      <input type="submit"
+             onclick="document.getElementById('pkgCode').value='CAL'"
+             value="SEND $196 CAL CLOG"
+             style="padding:8px 14px; border:0; border-radius:6px; background:#0b6; color:#fff; font-weight:700; cursor:pointer;">
+
+      <input type="submit"
+             onclick="document.getElementById('pkgCode').value='IML'"
+             value="SEND $396 IML CLOG"
+             style="padding:8px 14px; border:0; border-radius:6px; background:#06c; color:#fff; font-weight:700; cursor:pointer;">
+    </div>
+  </form>
+</div>
+
+<!-- Confirmation message (hidden by default) -->
+<div id="confirmationMessage" style="display:none; font-weight:600; color:green; padding:10px;">
+  ✅ Email Successfully Sent!
+  <br><br>
+  <button onclick="goBack()" 
+          style="padding:6px 12px; border:0; border-radius:4px; background:#444; color:#fff; cursor:pointer;">
+    ⬅ Back
+  </button>
+</div>
+
+<!-- Hidden iframe to catch API response so Vicidial doesn't go blank -->
+<iframe name="hiddenFrame" style="display:none;"></iframe>
+
+<script>
+function showConfirmation() {
+  document.getElementById('clogFormWrapper').style.display = "none";
+  document.getElementById('confirmationMessage').style.display = "block";
+}
+
+function goBack() {
+  // Reset the form fields
+  document.getElementById('clogForm').reset();
+  // Hide confirmation
+  document.getElementById('confirmationMessage').style.display = "none";
+  // Show form again
+  document.getElementById('clogFormWrapper').style.display = "block";
+}
+</script>
+<div>
+
+  <p>
+    Because it’s a FANTASTIC cruise vacation that you can use anytime you want in the next 18 months for you and any guest you choose.
+  </p>
+
+  <p>Can I verify your email really quick?</p>
+
+  <p><span style="background:yellow; font-weight:bold; font-style:italic;">(IF YES)</span></p>
+
+  <p>
+    From everyone here with Margaritaville at Sea, I'd like to be the first to say 
+    <strong>"WELCOME ABOARD!"</strong>
+  </p>
+
+  <p>
+    The total cost of your government port taxes are <strong>THREE HUNDRED AND NINETY SIX dollars</strong> and that is charged today and will show up on your next billing statement, please hold while I generate your confirmation code. Thank you.  
+    <span style="background:yellow; font-weight:bold; font-style:italic;">(Place customer on hold to run the deal &amp; get deal #)</span>
+  </p>
+
+  <p>
+    I just generated your confirmation code for your free cruise and this is so amazing!! You’re going to love this.
+  </p>
+
+  <p>
+    The computer randomly selects 10 of the free cruise customers per state to help promote Florida and its newest cruise line by giving a VIP extended stay vacation at a HUGE discount!!
+  </p>
+
+  <p>Your confirmation number was one of the 10 chosen for (Customer’s state)!</p>
+
+  <p><strong>Congratulations!</strong></p>
+
+  <p>
+    Please keep in mind that this is available only for (Customer State) residents that are VIP 1st time cruisers because we know as soon as you set sail, you’re not going to want your vacation to end! 
+  </p>
+
+  <p>I am soooo excited!</p>
+
+  <p>Let me tell you how this fabulous vacation unfolds.</p>
+
+  <p>
+    (Customer’s name) when you get down here we aren’t going to just let you try and figure out where everything is on your own so we are going to invite you to our VIP welcome center where they will give you lots of information on area attractions, great dining places and directions so you will know where everything is and what there is to do in order to make your stay more enjoyable.
+  </p>
+
+  <p>
+    First when you arrive down here to go on your cruise, you’ll arrive in Orlando. In Orlando we give you 3 days and 2 nights of gorgeous triple diamond resort accommodations at one of our nationally recognized resorts, all hotel accommodations paid.
+  </p>
+
+  <p>
+    While in Orlando you’ll be centrally located to all the major attractions like Disney, Sea World, Universal Studios, City Walk for your night time entertainment and it doesn’t stop there.
+  </p>
+
+  <p>
+    Now here’s where it gets exciting. After your 3 days and 2 nights in Orlando you head right down the road to the port of Tampa and set sail on the cruise you’ve been selected to receive, you’re going to love the Margaritaville Islander, but instead of just sailing for 4 nights we’re going to upgrade you with an additional 2 nights so you’ll now have a 7 day, 6 night cruise so you can sail to more destinations.
+  </p>
+
+  <p>Plus, on board the Islander, you’ll enjoy:</p>
+  <ul>
+    <li>Jimmy Buffett-inspired restaurants &amp; bars</li>
+    <li>Live concerts and comedy shows</li>
+    <li>Spa &amp; wellness centers</li>
+    <li>Poolside lounging and tropical cocktails</li>
+    <li>Casino action</li>
+    <li>And of course… the legendary Captain’s Dinner</li>
+  </ul>
+
+  <p>
+    Now after all your fun and sun on your cruise, we’re not gunna just send you right back home, we’re now going to send you to one of the most famous beaches in Florida, Ft. Lauderdale, for 4 days and 3 nights of GORGEOUS Triple-Diamond resort accommodations at one of our nationally-recognized resorts, all hotel accommodations paid.
+  </p>
+
+  <p>
+    While in Fort Lauderdale, you’ll be centrally-located to all the activities South Florida has to offer; you know, the world-famous SHOPPING, DINING, and NIGHTLIFE. 
+    And then of course, there’s the 23 miles of white sandy beaches and world-famous boardwalks, and it doesn’t stop there!!
+  </p>
+
+  <p>
+    I do want to mention that although the Ft. Lauderdale/Miami area is one of my favorites, this part of the VIP extended stay is fully customizable. Maybe you want 3 additional nights in Orlando, or take those 3 nights as a separate vacation. It’s all up to you, it’s your vacation, and you don’t have to decide that today.
+  </p>
+
+  <p>
+    We also give you a <strong>$100.00 Universal &amp; Disney Entertainment Voucher</strong> that you can use for Theme Parks, Attractions, or evening dining while you're on vacation!
+  </p>
+
+  <p>
+    Now ------, this VIP "Extended-Stay" vacation is NOT available to the general public!
+  </p>
+
+  <p>What your VIP vacation includes is:</p>
+  <ul>
+    <li>3 Days &amp; 2 Nights of Hotel Accommodations at an Official Universal Studios Destination Resort + $100.00 Entertainment Dollar Voucher for Theme Parks and other Entertainment</li>
+    <li>5 Day 4 Night cruise on the award winning Margaritaville Islander where you can choose your destinations</li>
+    <li>4 Days and 3 Nights in Ft. Lauderdale so you can enjoy everything South Florida has to offer</li>
+  </ul>
+
+  <p>
+    Again, we put this vacation together for you to have a great time, and then tell your family and friends all about us when you get back home. Now you said you can do that for us, right?
+  </p>
+
+  <p><span style="background:yellow; font-weight:bold; font-style:italic;">(Get Response)</span></p>
+
+  <p><strong>GREAT!</strong></p>
+
+  <p>
+    Also, with the Extended Stay Vacation Package you will be a VIP with Margaritaville At Sea — which means you can travel at any time of the year!
+  </p>
+
+  <p>
+    Now Mr./Mrs. ______________________, this is important. This is an exclusive vacation offer not available to the general public and is offered on a first come, first serve basis because of the discounted price and limited availability.
+  </p>
+
+  <p>
+    Now (Customer’s name) I’m sure you can imagine your VIP extended stay vacation is valued at well over $4,950. However, in exchange for helping us with some good old-fashioned word-of-mouth advertising and touring one of our developer’s fine vacation resorts, you are now approved for the VIP “Extended-Stay” vacation.
+  </p>
+
+  <p>
+    Now (Customer’s name) I can now add all of this Florida vacation excitement to your cruise for only <strong>$787 per person</strong>.  
+    So the total is only <strong>$1574</strong> for the extended stay, plus the $396 for the port taxes that you’ve already paid.  
+    So your grand total is only <strong>$1970</strong> and that includes everything we talked about earlier.  
+    The 3 days and 2 nights in Orlando, the upgrade to the 7 day 6 night cruise on the amazing Islander, and the additional 4 days &amp; 3 nights in South Florida that you could even use at another time.  
+    Oh yeah, let’s not forget about the $100 entertainment voucher.
+  </p>
+
+  <p>
+    It’s amazing how good of a deal you can get directly from the owner of the cruise line. And we give you 18 months to use the vacation.
+  </p>
+
+  <p><em>Now you can see why everyone is doing it!!</em></p>
+
+  <p>
+    So you’re already registered for your cruise, now we can add the $1,674 to the same card that you provided for your port tax or would you prefer to use a different card?
+  </p>
+
+</div>
+
+
+
+
+
