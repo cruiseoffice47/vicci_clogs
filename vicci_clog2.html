@@ -1,0 +1,37 @@
+<form action="https://api.emailclogs.com/Clog/Send" method="post" target="_blank" style="display:grid; gap:8px; max-width:520px;">
+
+
+
+  <label style="font-weight:600;">First Name
+    <input type="text" name="firstName" value="--A--first_name--B--"
+           style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px;" required>
+  </label>
+
+  <label style="font-weight:600;">Last Name
+    <input type="text" name="lastName" value="--A--last_name--B--"
+           style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px;" required>
+  </label>
+
+  <label style="font-weight:600;">Email
+    <input type="email" name="email" value="--A--email--B--"
+           style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px;" required>
+  </label>
+
+  <input type="hidden" name="apiKey" value="V1C1.P0$t@4P1">
+  <input type="hidden" id="pkgCode" name="packageCode" value="">
+
+  <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:6px;">
+    <input type="submit"
+           onclick="document.getElementById('pkgCode').value='CAL'"
+           style="padding:8px 14px; border:0; border-radius:6px; background:#0b6; color:#fff; font-weight:700; font-size:13px; cursor:pointer;"
+           value="SEND $196 CAL CLOG">
+
+    <input type="submit"
+           onclick="document.getElementById('pkgCode').value='IML'"
+           style="padding:8px 14px; border:0; border-radius:6px; background:#06c; color:#fff; font-weight:700; font-size:13px; cursor:pointer;"
+           value="SEND $396 IML CLOG">
+  </div>
+
+</form>
+
+
