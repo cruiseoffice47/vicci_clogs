@@ -1,5 +1,8 @@
 <div id="clogFormWrapper">
-  <form action="https://api.emailclogs.com/Clog/Send" method="post" target="hiddenFrame" 
+  <form id="clogForm" 
+        action="https://api.emailclogs.com/Clog/Send" 
+        method="post" 
+        target="hiddenFrame" 
         style="display:grid; gap:8px; max-width:520px;"
         onsubmit="showConfirmation()">
 
@@ -38,6 +41,11 @@
 <!-- Confirmation message (hidden by default) -->
 <div id="confirmationMessage" style="display:none; font-weight:600; color:green; padding:10px;">
   ✅ Email Successfully Sent!
+  <br><br>
+  <button onclick="goBack()" 
+          style="padding:6px 12px; border:0; border-radius:4px; background:#444; color:#fff; cursor:pointer;">
+    ⬅ Back
+  </button>
 </div>
 
 <!-- Hidden iframe to catch API response so Vicidial doesn't go blank -->
@@ -45,9 +53,16 @@
 
 <script>
 function showConfirmation() {
-  // Hide form wrapper
   document.getElementById('clogFormWrapper').style.display = "none";
-  // Show confirmation
   document.getElementById('confirmationMessage').style.display = "block";
+}
+
+function goBack() {
+  // Reset the form fields
+  document.getElementById('clogForm').reset();
+  // Hide confirmation
+  document.getElementById('confirmationMessage').style.display = "none";
+  // Show form again
+  document.getElementById('clogFormWrapper').style.display = "block";
 }
 </script>
