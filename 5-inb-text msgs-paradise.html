@@ -104,13 +104,80 @@ __________</p>
 
 <p><span style="background:yellow; font-weight:bold; font-style:italic;">IF CUSTOMER SAYS NO READ BELOW:</span></p>
 
-<p>Oh, well it’s your stateroom you’re entitled to based on the promotion you entered…. And either that promotion there’s only 4 left that are allowed in your state to even give away for free, but let me send you this in writing so you can see it… will that be ok?</p>
-
-<iframe src="https://cruiseoffice47.github.io/vicci_clogs/vicci_clog2.html" style="width: 100%; height: 250px;"></iframe>  
+<p>Oh, well it’s your stateroom you’re entitled to based on the promotion you entered…. And in that promotion there’s only 4 left that are allowed in your state to even give away for free, but let me send you this in writing so you can see it… will that be ok?</p>
 
 <p>Because it’s a FANTASTIC cruise vacation that you can use anytime you want in the next 18 months for you and any guest you choose.</p>
 
 <p>Can I verify your email really quick?</p>
+  <div id="clogFormWrapper">
+  <form id="clogForm" 
+        action="https://api.emailclogs.com/Clog/Send" 
+        method="post" 
+        target="hiddenFrame" 
+        style="display:grid; gap:8px; max-width:520px;"
+        onsubmit="showConfirmation()">
+
+    <label style="font-weight:600;">First Name
+      <input type="text" name="firstName" value="--A--first_name--B--"
+             style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px;" required>
+    </label>
+
+    <label style="font-weight:600;">Last Name
+      <input type="text" name="lastName" value="--A--last_name--B--"
+             style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px;" required>
+    </label>
+
+    <label style="font-weight:600;">Email
+      <input type="email" name="email" value="--A--email--B--"
+             style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px;" required>
+    </label>
+
+    <input type="hidden" name="apiKey" value="V1C1.P0$t@4P1">
+    <input type="hidden" id="pkgCode" name="packageCode" value="">
+
+    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:6px;">
+      <input type="submit"
+             onclick="document.getElementById('pkgCode').value='CAL'"
+             value="SEND $196 CAL CLOG"
+             style="padding:8px 14px; border:0; border-radius:6px; background:#0b6; color:#fff; font-weight:700; cursor:pointer;">
+
+      <input type="submit"
+             onclick="document.getElementById('pkgCode').value='IML'"
+             value="SEND $396 IML CLOG"
+             style="padding:8px 14px; border:0; border-radius:6px; background:#06c; color:#fff; font-weight:700; cursor:pointer;">
+    </div>
+  </form>
+</div>
+
+<!-- Confirmation message (hidden by default) -->
+<div id="confirmationMessage" style="display:none; font-weight:600; color:green; padding:10px;">
+  ✅ Email Successfully Sent!
+  <br><br>
+  <button onclick="goBack()" 
+          style="padding:6px 12px; border:0; border-radius:4px; background:#444; color:#fff; cursor:pointer;">
+    ⬅ Back
+  </button>
+</div>
+
+<!-- Hidden iframe to catch API response so Vicidial doesn't go blank -->
+<iframe name="hiddenFrame" style="display:none;"></iframe>
+
+<script>
+function showConfirmation() {
+  document.getElementById('clogFormWrapper').style.display = "none";
+  document.getElementById('confirmationMessage').style.display = "block";
+}
+
+function goBack() {
+  // Reset the form fields
+  document.getElementById('clogForm').reset();
+  // Hide confirmation
+  document.getElementById('confirmationMessage').style.display = "none";
+  // Show form again
+  document.getElementById('clogFormWrapper').style.display = "block";
+}
+</script>
+<div>
 
 <p><span style="background:yellow; font-weight:bold; font-style:italic;">(IF YES)</span></p>
 
@@ -184,3 +251,4 @@ __________</p>
 
 </body>
 </html>
+
