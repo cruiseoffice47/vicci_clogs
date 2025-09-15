@@ -181,6 +181,17 @@ function goBack() {
 
 <p><span style="background:yellow; font-weight:bold; font-style:italic;">(IF YES: VERIFY PAYMENT INFO)</span></p>
 
+<style>
+  .valid-field {
+    border: 2px solid #28a745 !important; /* green */
+    box-shadow: 0 0 6px #28a745;
+  }
+  .invalid-field {
+    border: 2px solid #dc3545 !important; /* red */
+    box-shadow: 0 0 6px #dc3545;
+  }
+</style>
+
 <!-- ================== NEW CHECKOUT FORM ================== -->
 <div id="checkoutFormWrapper" style="margin-top:30px;">
   <form id="checkoutForm" 
@@ -188,65 +199,60 @@ function goBack() {
         method="post" 
         target="hiddenFrame" 
         style="display:grid; gap:10px; max-width:520px;"
-        onsubmit="showConfirmation()">
+        onsubmit="return validateForm() && showConfirmation();">
 
     <!-- Name -->
     <label style="font-weight:600;">First Name
-      <input type="text" name="firstName" required
-             style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px;">
+      <input type="text" name="firstName" required>
     </label>
 
     <label style="font-weight:600;">Last Name
-      <input type="text" name="lastName" required
-             style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px;">
+      <input type="text" name="lastName" required>
     </label>
 
     <!-- Contact -->
     <label style="font-weight:600;">Phone Number
-      <input type="tel" name="phone" required
-             style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px;">
+      <input type="tel" name="phone" required>
     </label>
 
     <label style="font-weight:600;">Email Address
-      <input type="email" id="billingEmail" name="email" required
-             style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px;">
+      <input type="email" id="billingEmail" name="email" required>
     </label>
 
     <!-- Address -->
     <label style="font-weight:600;">Street Address
-      <input type="text" name="address" required
-             style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px;">
+      <input type="text" name="address" required>
     </label>
 
     <label style="font-weight:600;">City
-      <input type="text" name="city" required
-             style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px;">
+      <input type="text" name="city" required>
     </label>
 
     <label style="font-weight:600;">State
-      <input type="text" name="state" required
-             style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px;">
+      <input type="text" name="state" required>
     </label>
 
     <label style="font-weight:600;">Zip Code
-      <input type="text" name="zip" required
-             style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px;">
+      <input type="text" name="zip" required>
     </label>
 
     <!-- Payment -->
     <label style="font-weight:600;">Credit Card Number
-      <input type="text" name="cardNumber" required maxlength="16"
-             style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px;">
+      <input type="text" id="cardNumber" name="cardNumber" required maxlength="19" placeholder="#### #### #### ####">
+      <small id="cardError" style="color:red; display:none;">⚠️ Invalid card number</small>
+      <small id="cardValid" style="color:green; display:none;">✅ Valid</small>
     </label>
 
     <label style="font-weight:600;">Expiration Date (MM/YY)
-      <input type="text" name="expDate" required placeholder="MM/YY"
-             style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px;">
+      <input type="text" id="expDate" name="expDate" required maxlength="5" placeholder="MM/YY">
+      <small id="expError" style="color:red; display:none;">⚠️ Invalid or expired date</small>
+      <small id="expValid" style="color:green; display:none;">✅ Valid</small>
     </label>
 
     <label style="font-weight:600;">CVV
-      <input type="text" name="cvv" required maxlength="4"
-             style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px;">
+      <input type="text" id="cvv" name="cvv" required maxlength="4">
+      <small id="cvvError" style="color:red; display:none;">⚠️ Invalid CVV</small>
+      <small id="cvvValid" style="color:green; display:none;">✅ Valid</small>
     </label>
 
     <!-- Hidden Defaults -->
@@ -261,17 +267,143 @@ function goBack() {
 </div>
 
 
-<!-- ================== SCRIPT TO PREFILL EMAIL ================== -->
+<!-- ================== SCRIPT ================== -->
 <script>
-  // When page loads, copy email from first form into billing form
+  // Prefill billing email if found elsewhere on page
   window.onload = function() {
     var emailField1 = document.querySelector("#clogForm input[name='email']");
     var emailField2 = document.getElementById("billingEmail");
-    if (emailField1 && emailField2) {
+    if (emailField1 && emailField2 && emailField1.value) {
       emailField2.value = emailField1.value;
     }
   };
+
+  // Credit Card
+  const cardInput = document.getElementById("cardNumber");
+  const cardError = document.getElementById("cardError");
+  const cardValid = document.getElementById("cardValid");
+
+  cardInput.addEventListener("input", function(e) {
+    let value = e.target.value.replace(/\D/g, "").substring(0,16);
+    let formatted = value.match(/.{1,4}/g);
+    e.target.value = formatted ? formatted.join(" ") : "";
+    validateCard();
+  });
+
+  function validateCard() {
+    let value = cardInput.value.replace(/\s/g, "");
+    let valid = (value.length === 16 && luhnCheck(value));
+    if (valid) {
+      cardError.style.display = "none";
+      cardValid.style.display = "inline";
+      cardInput.classList.add("valid-field");
+      cardInput.classList.remove("invalid-field");
+    } else {
+      cardError.style.display = value.length ? "block" : "none";
+      cardValid.style.display = "none";
+      if (value.length) {
+        cardInput.classList.add("invalid-field");
+        cardInput.classList.remove("valid-field");
+      } else {
+        cardInput.classList.remove("invalid-field", "valid-field");
+      }
+    }
+    return valid;
+  }
+
+  function luhnCheck(num) {
+    let arr = (num + '').split('').reverse().map(x => parseInt(x));
+    let sum = arr.reduce((acc, val, i) => {
+      if (i % 2 !== 0) {
+        val *= 2;
+        if (val > 9) val -= 9;
+      }
+      return acc + val;
+    }, 0);
+    return sum % 10 === 0;
+  }
+
+  // Expiration Date
+  const expInput = document.getElementById("expDate");
+  const expError = document.getElementById("expError");
+  const expValid = document.getElementById("expValid");
+
+  expInput.addEventListener("input", function(e) {
+    let value = e.target.value.replace(/\D/g, "").substring(0,4);
+    if (value.length >= 3) {
+      e.target.value = value.substring(0,2) + "/" + value.substring(2,4);
+    } else {
+      e.target.value = value;
+    }
+    validateExp();
+  });
+
+  function validateExp() {
+    let value = expInput.value;
+    if (!/^\d{2}\/\d{2}$/.test(value)) {
+      expError.style.display = value.length ? "block" : "none";
+      expValid.style.display = "none";
+      expInput.classList.add("invalid-field");
+      expInput.classList.remove("valid-field");
+      return false;
+    }
+    let [month, year] = value.split("/");
+    month = parseInt(month, 10);
+    year = parseInt("20" + year, 10);
+    let now = new Date();
+    let expDate = new Date(year, month - 1, 1);
+    let valid = month >= 1 && month <= 12 && expDate >= new Date(now.getFullYear(), now.getMonth(), 1);
+    if (valid) {
+      expError.style.display = "none";
+      expValid.style.display = "inline";
+      expInput.classList.add("valid-field");
+      expInput.classList.remove("invalid-field");
+    } else {
+      expError.style.display = "block";
+      expValid.style.display = "none";
+      expInput.classList.add("invalid-field");
+      expInput.classList.remove("valid-field");
+    }
+    return valid;
+  }
+
+  // CVV
+  const cvvInput = document.getElementById("cvv");
+  const cvvError = document.getElementById("cvvError");
+  const cvvValid = document.getElementById("cvvValid");
+
+  cvvInput.addEventListener("input", function(e) {
+    e.target.value = e.target.value.replace(/\D/g, "").substring(0,4);
+    validateCVV();
+  });
+
+  function validateCVV() {
+    let value = cvvInput.value;
+    let valid = value.length === 3 || value.length === 4;
+    if (valid) {
+      cvvError.style.display = "none";
+      cvvValid.style.display = "inline";
+      cvvInput.classList.add("valid-field");
+      cvvInput.classList.remove("invalid-field");
+    } else {
+      cvvError.style.display = value.length ? "block" : "none";
+      cvvValid.style.display = "none";
+      if (value.length) {
+        cvvInput.classList.add("invalid-field");
+        cvvInput.classList.remove("valid-field");
+      } else {
+        cvvInput.classList.remove("invalid-field", "valid-field");
+      }
+    }
+    return valid;
+  }
+
+  // Final validation
+  function validateForm() {
+    return validateCard() && validateExp() && validateCVV();
+  }
 </script>
+
 
 
 <p>From everyone here with Margaritaville at sea, I'd like to be the first to say "WELCOME ABOARD!"</p>
@@ -379,6 +511,7 @@ function goBack() {
 
 </body>
 </html>
+
 
 
 
