@@ -89,90 +89,489 @@ __________ __________</p>
 
 <p>So <i>(Customer's Name)</i> here's how things work out for you. Because there's only a few cabins left for your state and due to the $900 value, we are assigning cabin on a first come first serve basis. So in order to secure your cruise and generate a confirmation code, you simply need to secure the government port taxes and fees of only $198 per person for a total of only $396 today.</p>
 
-<p><span style="background:yellow; font-style:italic;">So to secure your port taxes and fees, would you like to use a visa, mastercard, discover, or american express?</span></p>
+ <p>So to secure your port taxes and fees, which card would you like to use- Visa, MasterCard Discover, or American
+    Express?</p>
 
-<p><span style="background:yellow; font-weight:bold; font-style:italic;">IF CUSTOMER SAYS NO READ BELOW:</span></p>
+  <p><span style="background:yellow; font-weight:bold; font-style:italic;">IF CUSTOMER SAYS NO READ BELOW:</span></p>
 
-<p>Oh, well it’s your stateroom you’re entitled to based on the promotion you entered…. And in that promotion there’s only 4 left that are allowed in your state to even give away for free, but let me send you this in writing so you can see it… will that be ok?</p>
+  <p>Oh, well it’s your stateroom you’re entitled to based on the promotion you entered…. And in that promotion there’s
+    only 4 left that are allowed in your state to even give away for free, but let me send you this in writing so you
+    can see it… will that be ok?</p>
 
-<p>Because it’s a FANTASTIC cruise vacation that you can use anytime you want in the next 18 months for you and any guest you choose.</p>
 
-<p><span style="background:yellow; font-style:italic;">Can I verify your email really quick?</span></p>
+  <p>Because it’s a FANTASTIC cruise vacation that you can use anytime you want in the next 18 months for you and any
+    guest you choose.</p>
 
-<div id="clogFormWrapper">
-  <form id="clogForm" 
-        action="https://api.emailclogs.com/Clog/Send" 
-        method="post" 
-        target="hiddenFrame" 
-        style="display:grid; gap:8px; max-width:520px;"
-        onsubmit="showConfirmation()">
 
-    <label style="font-weight:600;">First Name
-      <input type="text" name="firstName" value="__________"
-             style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px;" required>
-    </label>
+ <p>Can I verify your email really quick?</p>
+  <div id="clogFormWrapper">
+    <form id="clogForm" action="https://api.emailclogs.com/Clog/Send" method="post" target="hiddenFrame"
+      style="display:grid; gap:8px; max-width:520px;" onsubmit="showConfirmation()">
 
-    <label style="font-weight:600;">Last Name
-      <input type="text" name="lastName" value="__________"
-             style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px;" required>
-    </label>
+      <label style="font-weight:600;">First Name
+        <input type="text" name="firstName" value="--A--first_name--B--"
+          style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px;" required>
+      </label>
 
-    <label style="font-weight:600;">Email
-      <input type="email" name="email" value="__________"
-             style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px;" required>
-    </label>
+      <label style="font-weight:600;">Last Name
+        <input type="text" name="lastName" value="--A--last_name--B--"
+          style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px;" required>
+      </label>
 
-    <input type="hidden" name="apiKey" value="V1C1.P0$t@4P1">
-    <input type="hidden" id="pkgCode" name="packageCode" value="">
+      <label style="font-weight:600;">Email
+        <input type="email" name="email" value="--A--email--B--"
+          style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px;" required>
+      </label>
 
-    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:6px;">
-      <input type="submit"
-             onclick="document.getElementById('pkgCode').value='CAL'"
-             value="SEND $196 CAL CLOG"
-             style="padding:8px 14px; border:0; border-radius:6px; background:#0b6; color:#fff; font-weight:700; cursor:pointer;">
+      <input type="hidden" name="apiKey" value="V1C1.P0$t@4P1">
+      <input type="hidden" id="pkgCode" name="packageCode" value="">
 
-      <input type="submit"
-             onclick="document.getElementById('pkgCode').value='IML'"
-             value="SEND $396 IML CLOG"
-             style="padding:8px 14px; border:0; border-radius:6px; background:#06c; color:#fff; font-weight:700; cursor:pointer;">
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:6px;">
+        <input type="submit" onclick="document.getElementById('pkgCode').value='CAL'" value="SEND $196 CAL CLOG"
+          style="padding:8px 14px; border:0; border-radius:6px; background:#0b6; color:#fff; font-weight:700; cursor:pointer;">
+
+        <input type="submit" onclick="document.getElementById('pkgCode').value='IML'" value="SEND $396 IML CLOG"
+          style="padding:8px 14px; border:0; border-radius:6px; background:#06c; color:#fff; font-weight:700; cursor:pointer;">
+      </div>
+    </form>
+  </div>
+
+  <!-- Confirmation message (hidden by default) -->
+  <div id="confirmationMessage" style="display:none; font-weight:600; color:green; padding:10px;">
+    ✅ Email Successfully Sent!
+    <br><br>
+    <button onclick="goBack()"
+      style="padding:6px 12px; border:0; border-radius:4px; background:#444; color:#fff; cursor:pointer;">
+      ⬅ Back
+    </button>
+  </div>
+
+  <!-- Hidden iframe to catch API response so Vicidial doesn't go blank -->
+  <iframe name="hiddenFrame" style="display:none;"></iframe>
+
+  <script>
+    function showConfirmation() {
+      document.getElementById('clogFormWrapper').style.display = "none";
+      document.getElementById('confirmationMessage').style.display = "block";
+    }
+
+    function goBack() {
+      // Reset the form fields
+      document.getElementById('clogForm').reset();
+      // Hide confirmation
+      document.getElementById('confirmationMessage').style.display = "none";
+      // Show form again
+      document.getElementById('clogFormWrapper').style.display = "block";
+    }
+  </script>
+  <div>
+
+    <p><span style="background:yellow; font-weight:bold; font-style:italic;">(IF YES: VERIFY PAYMENT INFO)</span></p>
+
+    <style>
+      .valid-field {
+        border: 2px solid #28a745 !important;
+        /* green */
+        box-shadow: 0 0 6px #28a745;
+      }
+
+      .invalid-field {
+        border: 2px solid #dc3545 !important;
+        /* red */
+        box-shadow: 0 0 6px #dc3545;
+      }
+
+      /* Drop into your <style> block */
+      .alert {
+        padding: 12px 14px;
+        border-radius: 8px;
+        font-weight: 600;
+      }
+
+      .alert-success {
+        background: #e9fbe9;
+        border: 1px solid #b8efb8;
+        color: #0a5;
+      }
+
+      .alert-error {
+        background: #fff1f0;
+        border: 1px solid #ffd6d2;
+        color: #c00;
+      }
+
+      button.is-loading {
+        position: relative;
+        pointer-events: none;
+        opacity: .8;
+      }
+
+      button.is-loading::after {
+        content: "";
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        width: 14px;
+        height: 14px;
+        margin-top: -7px;
+        border: 2px solid currentColor;
+        border-right-color: transparent;
+        border-radius: 50%;
+        animation: spin .6s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg)
+        }
+      }
+    </style>
+
+    <!-- ================== NEW CHECKOUT FORM ================== -->
+    <div id="checkoutFormWrapper" style="margin-top:30px;">
+      <form id="checkoutForm" action="#" method="post" style="display:grid; gap:10px; max-width:520px;"
+        onsubmit="return validateForm()">
+
+        <!-- onsubmit="return validateForm() && showConfirmation();" -->
+        <!-- Agent ID -->
+        <label style="font-weight:600;">Agent ID
+          <input type="text" name="agentId" required>
+        </label>
+
+        <!-- Name -->
+        <label style="font-weight:600;">First Name
+          <input type="text" name="firstName" required>
+        </label>
+
+        <label style="font-weight:600;">Last Name
+          <input type="text" name="lastName" required>
+        </label>
+
+        <!-- Contact -->
+        <label style="font-weight:600;">Phone Number
+          <input type="tel" name="phone" required>
+        </label>
+
+        <label style="font-weight:600;">Email Address
+          <input type="email" id="billingEmail" name="email" required>
+        </label>
+
+        <!-- Address -->
+        <label style="font-weight:600;">Street Address
+          <input type="text" name="address1" required>
+        </label>
+
+        <label style="font-weight:600;">City
+          <input type="text" name="city" required>
+        </label>
+
+        <label style="font-weight:600;">State
+          <input type="text" name="state" required>
+        </label>
+
+        <label style="font-weight:600;">Zip Code
+          <input type="text" name="zip" required>
+        </label>
+
+        <!-- Payment -->
+        <label style="font-weight:600;">Credit Card Number
+          <input type="text" id="cardNumber" name="cardNumber" required maxlength="19"
+            placeholder="#### #### #### ####">
+          <small id="cardError" style="color:red; display:none;">⚠️ Invalid card number</small>
+          <small id="cardValid" style="color:green; display:none;">✅ Valid</small>
+        </label>
+
+        <label style="font-weight:600;">Expiration Date (MM/YY)
+          <input type="text" id="expDate" name="expDate" required maxlength="5" placeholder="MM/YY">
+          <small id="expError" style="color:red; display:none;">⚠️ Invalid or expired date</small>
+          <small id="expValid" style="color:green; display:none;">✅ Valid</small>
+        </label>
+
+        <label style="font-weight:600;">CVV
+          <input type="text" id="cvv" name="cvv" required maxlength="4">
+          <small id="cvvError" style="color:red; display:none;">⚠️ Invalid CVV</small>
+          <small id="cvvValid" style="color:green; display:none;">✅ Valid</small>
+        </label>
+
+
+        <!-- Hidden Defaults -->
+        <input type="hidden" name="address2" value="IML">
+        <input type="hidden" name="productCode" value="IML">
+        <input type="hidden" name="productPrice" value="396.00">
+        <input type="hidden" name="apiKey" value="V1C1.P0$t@4P1">
+
+        <!-- Submit Button -->
+        <input type="submit" value="Submit Payment $396.00"
+          style="padding:10px 16px; border:0; border-radius:6px; background:#c33; color:#fff; font-weight:700; cursor:pointer;">
+      </form>
     </div>
-  </form>
-</div>
 
-<!-- Confirmation message (hidden by default) -->
-<div id="confirmationMessage" style="display:none; font-weight:600; color:green; padding:10px;">
-  ✅ Email Successfully Sent!
-  <br><br>
-  <button onclick="goBack()" 
-          style="padding:6px 12px; border:0; border-radius:4px; background:#444; color:#fff; cursor:pointer;">
-    ⬅ Back
-  </button>
-</div>
+    <!-- “Label” to show API responses -->
 
-<!-- Hidden iframe to catch API response -->
-<iframe name="hiddenFrame" style="display:none;"></iframe>
+    <div id="apiResult" role="status" aria-live="polite" tabindex="-1" class="alert" style="display:none"></div>
 
-<script>
-function showConfirmation() {
-  document.getElementById('clogFormWrapper').style.display = "none";
-  document.getElementById('confirmationMessage').style.display = "block";
-}
-function goBack() {
-  document.getElementById('clogForm').reset();
-  document.getElementById('confirmationMessage').style.display = "none";
-  document.getElementById('clogFormWrapper').style.display = "block";
-}
-</script>
+
+    <!-- ================== SCRIPT ================== -->
+    <script>
+      // Prefill billing email if found elsewhere on page
+      window.onload = function () {
+        var emailField1 = document.querySelector("#clogForm input[name='email']");
+        var emailField2 = document.getElementById("billingEmail");
+        if (emailField1 && emailField2 && emailField1.value) {
+          emailField2.value = emailField1.value;
+        }
+      };
+
+      // Credit Card
+      const cardInput = document.getElementById("cardNumber");
+      const cardError = document.getElementById("cardError");
+      const cardValid = document.getElementById("cardValid");
+
+      cardInput.addEventListener("input", function (e) {
+        let value = e.target.value.replace(/\D/g, "").substring(0, 16);
+        let formatted = value.match(/.{1,4}/g);
+        e.target.value = formatted ? formatted.join(" ") : "";
+        validateCard();
+      });
+
+      function validateCard() {
+        let value = cardInput.value.replace(/\s/g, "");
+        let valid = (value.length === 16 && luhnCheck(value));
+        if (valid) {
+          cardError.style.display = "none";
+          cardValid.style.display = "inline";
+          cardInput.classList.add("valid-field");
+          cardInput.classList.remove("invalid-field");
+        } else {
+          cardError.style.display = value.length ? "block" : "none";
+          cardValid.style.display = "none";
+          if (value.length) {
+            cardInput.classList.add("invalid-field");
+            cardInput.classList.remove("valid-field");
+          } else {
+            cardInput.classList.remove("invalid-field", "valid-field");
+          }
+        }
+        return valid;
+      }
+
+      function luhnCheck(num) {
+        let arr = (num + '').split('').reverse().map(x => parseInt(x));
+        let sum = arr.reduce((acc, val, i) => {
+          if (i % 2 !== 0) {
+            val *= 2;
+            if (val > 9) val -= 9;
+          }
+          return acc + val;
+        }, 0);
+        return sum % 10 === 0;
+      }
+
+      // Expiration Date
+      const expInput = document.getElementById("expDate");
+      const expError = document.getElementById("expError");
+      const expValid = document.getElementById("expValid");
+
+      expInput.addEventListener("input", function (e) {
+        let value = e.target.value.replace(/\D/g, "").substring(0, 4);
+        if (value.length >= 3) {
+          e.target.value = value.substring(0, 2) + "/" + value.substring(2, 4);
+        } else {
+          e.target.value = value;
+        }
+        validateExp();
+      });
+
+      function validateExp() {
+        let value = expInput.value;
+        if (!/^\d{2}\/\d{2}$/.test(value)) {
+          expError.style.display = value.length ? "block" : "none";
+          expValid.style.display = "none";
+          expInput.classList.add("invalid-field");
+          expInput.classList.remove("valid-field");
+          return false;
+        }
+        let [month, year] = value.split("/");
+        month = parseInt(month, 10);
+        year = parseInt("20" + year, 10);
+        let now = new Date();
+        let expDate = new Date(year, month - 1, 1);
+        let valid = month >= 1 && month <= 12 && expDate >= new Date(now.getFullYear(), now.getMonth(), 1);
+        if (valid) {
+          expError.style.display = "none";
+          expValid.style.display = "inline";
+          expInput.classList.add("valid-field");
+          expInput.classList.remove("invalid-field");
+        } else {
+          expError.style.display = "block";
+          expValid.style.display = "none";
+          expInput.classList.add("invalid-field");
+          expInput.classList.remove("valid-field");
+        }
+        return valid;
+      }
+
+      // CVV
+      const cvvInput = document.getElementById("cvv");
+      const cvvError = document.getElementById("cvvError");
+      const cvvValid = document.getElementById("cvvValid");
+
+      cvvInput.addEventListener("input", function (e) {
+        e.target.value = e.target.value.replace(/\D/g, "").substring(0, 4);
+        validateCVV();
+      });
+
+      function validateCVV() {
+        let value = cvvInput.value;
+        let valid = value.length === 3 || value.length === 4;
+        if (valid) {
+          cvvError.style.display = "none";
+          cvvValid.style.display = "inline";
+          cvvInput.classList.add("valid-field");
+          cvvInput.classList.remove("invalid-field");
+        } else {
+          cvvError.style.display = value.length ? "block" : "none";
+          cvvValid.style.display = "none";
+          if (value.length) {
+            cvvInput.classList.add("invalid-field");
+            cvvInput.classList.remove("valid-field");
+          } else {
+            cvvInput.classList.remove("invalid-field", "valid-field");
+          }
+        }
+        return valid;
+      }
+
+      // Final validation
+      function validateForm() {
+        return validateCard() && validateExp() && validateCVV();
+      }
+
+
+      //const API_URL = "https://localhost:7045/Reservations/SubmitSale";
+      const API_URL = "https://api.emailclogs.com/Reservations/SubmitSale";
+      const form = document.getElementById("checkoutForm");
+      const resultEl = document.getElementById("apiResult");
+      const submitBtn = form.querySelector('button[type="submit"], input[type="submit"]');
+
+      // ---- helpers ----
+      function setLoading(on) {
+        if (!submitBtn) return;
+        if (!submitBtn.dataset.text) { submitBtn.dataset.text = submitBtn.value || submitBtn.textContent; }
+        if (on) {
+          submitBtn.classList.add('is-loading');
+          if (submitBtn.value !== undefined) submitBtn.value = "Submitting…";
+          else submitBtn.textContent = "Submitting…";
+          submitBtn.disabled = true;
+        } else {
+          submitBtn.classList.remove('is-loading');
+          if (submitBtn.value !== undefined) submitBtn.value = submitBtn.dataset.text;
+          else submitBtn.textContent = submitBtn.dataset.text;
+          submitBtn.disabled = false;
+        }
+      }
+      function showBanner(message, ok) {
+        resultEl.style.display = "block";
+        resultEl.className = "alert " + (ok ? "alert-success" : "alert-error");
+        resultEl.textContent = message || (ok ? "Success." : "Something went wrong.");
+        resultEl.focus({ preventScroll: true });
+        resultEl.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+
+      // Clear all user-entered fields if success.
+      // By default, we leave HIDDEN inputs (e.g., productCode/apiKey) alone.
+      function clearSaleForm(includeHidden = false) {
+        // Reset built-in validity classes
+        form.querySelectorAll('.valid-field, .invalid-field')
+          .forEach(el => el.classList.remove('valid-field', 'invalid-field'));
+
+        const els = form.querySelectorAll('input, select, textarea');
+        els.forEach(el => {
+          const type = (el.type || '').toLowerCase();
+          if (type === 'hidden' && !includeHidden) return;
+
+          switch (type) {
+            case 'checkbox':
+            case 'radio':
+              el.checked = false;
+              break;
+            case 'select-one':
+            case 'select-multiple':
+              // Choose whichever default you prefer:
+              el.selectedIndex = 0; // first option
+              break;
+            default:
+              el.value = '';
+          }
+        });
+      }
+
+      // gentle input UX (optional; keep what you already had)
+      const state = form.querySelector('input[name="state"]');
+      const zip = form.querySelector('input[name="zip"]');
+      const agentId = form.querySelector('input[name="agentId"]');
+      const phone = form.querySelector('input[name="phone"]');
+      state && state.addEventListener('input', e => e.target.value = e.target.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 2));
+      zip && zip.addEventListener('input', e => e.target.value = e.target.value.replace(/\D/g, '').slice(0, 5));
+      agentId && agentId.addEventListener('input', e => e.target.value = e.target.value.replace(/\D/g, '').slice(0, 5));
+      phone && phone.addEventListener('input', e => e.target.value = e.target.value.replace(/\D/g, '').slice(0, 10));
+
+      function quickValid() {
+        let ok = true;
+        for (const el of form.querySelectorAll('[required]')) {
+          if (!el.value) { ok = false; el.classList.add('invalid-field'); }
+          else el.classList.remove('invalid-field');
+        }
+        return ok;
+      }
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        if (!quickValid()) {
+          showBanner("Please fill out the required fields.", false);
+          return;
+        }
+
+        setLoading(true);
+        showBanner("Submitting…", true);
+
+        try {
+          const fd = new FormData(form); // binds with [FromForm]
+          const resp = await fetch(API_URL, { method: "POST", body: fd });
+
+          const ct = resp.headers.get("content-type") || "";
+          let text = "";
+          if (ct.includes("application/json")) {
+            const data = await resp.json();
+            text = (typeof data === "string") ? data : JSON.stringify(data);
+          } else {
+            text = await resp.text();
+          }
+
+          if (resp.ok) {
+            showBanner(text || "Success.", true);
+
+            // ✅ Clear the form only if the response text starts with 'SUCCESS'
+            if ((text || "").trim().toUpperCase().startsWith("SUCCESS")) {
+              clearSaleForm(/* includeHidden = */ false);
+            }
+
+          } else {
+            showBanner(text || `Error ${resp.status} ${resp.statusText}`, false);
+          }
+        } catch (err) {
+          showBanner(`Network error: ${err.message}`, false);
+        } finally {
+          setLoading(false);
+        }
+      });
+
+    </script>
 <div>
+From everyone here with Margaritaville at sea, I'd like to be the first to say "WELCOME ABOARD!"
 
-<p><span style="background:yellow; font-style:italic;">(IF YES)</span></p>
-
-<p>From everyone here with Margaritaville at sea, I'd like to be the first to say "WELCOME ABOARD!"</p>
-
-<p>💳 The total cost of your government port taxes are ONE HUNDRED AND NINTY SIX dollars and that is charged today and will show up on your next billing statement, please hold while I generate your confirmation code. Thank you.</p>
-
-<p><span style="background:yellow; font-style:italic;">PARK THE CALL (place customer on hold) & GO GET DEAL PROCESSED</span></p>
-
+The total cost of your government port taxes are THREE HUNDRED AND NINTY SIX dollars and that is charged today and will show up on your next billing statement, please hold while I generate your confirmation code. Thank you.
+<span style="background:yellow; font-weight:bold; font-style:italic;">PARK THE CALL(place customer on hold- Come back on the line in 20 to 30 seconds)</span>
 <p><i>(Customer’s Name)</i> I just generated your confirmation code for your free cruise and this is so amazing!! You’re going to love this.</p>
 
 <p>🖥️ The computer randomly selects 10 of the free cruise customers per state to help promote Florida and its newest cruise line by giving a VIP extended stay vacation at a HUGE discount!!</p>
@@ -244,4 +643,5 @@ function goBack() {
 
 </body>
 </html>
+
 
