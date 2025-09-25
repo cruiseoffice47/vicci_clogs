@@ -34,17 +34,17 @@
 
   // Shortcut for 123 FormBuilder field elements
 
-  const el = (id) => document.getElementById(`id123-control${id}`);
+  const el = (id) => document.getElementById(`${id}`);
 
   // ✅ Your actual field IDs
 
-  const resEl = el(119090879);     // Reservation #
+  const resEl = el('text-119090879');     // Reservation #
 
-  const pkgEl = el(119090888);     // Package Code
+  const pkgEl = el('text-119090888');     // Package Code
 
-  const inEl  = el(119090869);     // Check-in Date
+  const inEl  = document.querySelector('[aria-labelledby="datePicker-00000009-acc"]');      // Check-in Date
 
-  const outEl = el(119090870);     // Check-out Date
+  const outEl = document.querySelector('[aria-labelledby="datePicker-0000000b-acc"]');     // Check-out Date
 
   // Extract package code from reservation number (last part after dash)
 
@@ -118,4 +118,5 @@
 
 })();
  
+
 
