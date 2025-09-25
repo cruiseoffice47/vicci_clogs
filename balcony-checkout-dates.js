@@ -46,15 +46,17 @@
 
   const outEl = el(119086204);     // Check-out Date
 
-  // Extract package code from reservation number (last 3 letters after a dash)
+  // Extract package code from reservation number (last part after dash)
 
   function getPackageFromRes(reservation) {
 
     if (!reservation) return "";
 
-    const match = reservation.match(/-([A-Z]{3})$/);
+    const parts = reservation.split("-");
 
-    return match ? match[1] : "";
+    const lastPart = parts[parts.length - 1]; 
+
+    return lastPart.toUpperCase();
 
   }
 
