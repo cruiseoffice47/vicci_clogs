@@ -38,13 +38,13 @@
 
   // ✅ Your actual field IDs
 
-  const resEl = el(119086165);     // Reservation #
+  const resEl = el(119090879);     // Reservation #
 
-  const pkgEl = el(119086582);     // Package Code
+  const pkgEl = el(119090888);     // Package Code
 
-  const inEl  = el(119086203);     // Check-in Date
+  const inEl  = el(119090869);     // Check-in Date
 
-  const outEl = el(119086204);     // Check-out Date
+  const outEl = el(119090870);     // Check-out Date
 
   // Extract package code from reservation number (last part after dash)
 
@@ -118,3 +118,4 @@
 
 })();
  
+
