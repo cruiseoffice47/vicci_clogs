@@ -66,6 +66,8 @@
 
     const code = getPackageFromRes(resEl.value);
 
+    console.log('Package code: ' + code);
+
     if (NIGHTS_BY_CODE[code]) {
 
       pkgEl.value = code;  // auto-fill package field
@@ -118,5 +120,6 @@
 
 })();
  
+
 
 
