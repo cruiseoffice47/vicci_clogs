@@ -327,7 +327,7 @@ function goBack() {
 
       function validateCard() {
         let value = cardInput.value.replace(/\s/g, "");
-        let valid = (value.length === 16 && luhnCheck(value));
+        let valid = (value.length >= 15 && luhnCheck(value));
         if (valid) {
           cardError.style.display = "none";
           cardValid.style.display = "inline";
