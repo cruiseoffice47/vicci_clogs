@@ -1,0 +1,69 @@
+# Repository destination: .github/workflows/norwegian-source-refresh.yml
+# This probe creates no feed, sends no messages and uses no customer credentials.
+name: Norwegian source access probe
+
+on:
+  push:
+    paths:
+      - .github/workflows/norwegian-source-refresh.yml
+      - tools/norwegian/**
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: norwegian-source-refresh
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check ordinary anonymous NCL public requests
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, os, sys
+          from urllib.error import HTTPError, URLError
+          from urllib.request import Request, urlopen
+
+          requests = [
+              ('catalog', 'https://www.ncl.com/api/v2/vacations/search?limit=1&offset=0'),
+              ('sailings', 'https://www.ncl.com/api/vacations/sailings/JOY4MIANPINASMIA?dates=Nov-2026'),
+              ('dated_events', 'https://www.ncl.com/api/vacations/events/JOY4MIANPINASMIA/package/23379737'),
+          ]
+          results = []
+          for name, url in requests:
+              item = {'request': name, 'status': None, 'valid_schema': False}
+              try:
+                  request = Request(url, headers={'Accept': 'application/json', 'User-Agent': 'CruiseItinerarySourceCheck/1.0'})
+                  with urlopen(request, timeout=45) as response:
+                      raw = response.read()
+                      item.update(status=response.status, content_type=response.headers.get('Content-Type', ''), bytes=len(raw))
+                  data = json.loads(raw)
+                  item['valid_schema'] = (
+                      isinstance(data.get('itineraries'), list) and isinstance(data.get('total'), int) if name == 'catalog' else
+                      isinstance(data.get('pricingStateRooms'), list) if name == 'sailings' else
+                      isinstance(data.get('events'), list) and data.get('itineraryCode') == 'JOY4MIANPINASMIA' and str(data.get('packageId')) == '23379737'
+                  )
+                  item['response_sha256'] = hashlib.sha256(raw).hexdigest()
+              except HTTPError as error:
+                  item.update(status=error.code, error='ordinary_request_rejected')
+              except (URLError, TimeoutError, ValueError, TypeError) as error:
+                  item['error'] = type(error).__name__
+              results.append(item)
+
+          passed = all(item['status'] == 200 and item['valid_schema'] for item in results)
+          # Log schema/status evidence only: never raw fare payloads or credentials.
+          print(json.dumps({'probe_passed': passed, 'ordinary_anonymous_requests': True, 'feed_published': False, 'results': results}), flush=True)
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as summary:
+              summary.write('### Norwegian public-source access probe\n\n')
+              summary.write('| Request | HTTP status | Schema valid |\n|---|---:|---|\n')
+              for item in results:
+                  summary.write(f"| {item['request']} | {item['status']} | {item['valid_schema']} |\n")
+              summary.write('\nNo feed was published. A 403 is a failed probe; no alternate proxy, cookies or bypass is attempted.\n')
+          sys.exit(0 if passed else 1)
+          PY
+
