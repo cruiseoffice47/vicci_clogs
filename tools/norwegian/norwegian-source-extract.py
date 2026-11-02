@@ -18,6 +18,33 @@ ACCESS_STOPPED=threading.Event()
 DIAGNOSTIC_LOCK=threading.Lock()
 DIAGNOSTIC_COUNT=0
 
+class RequestLimiter:
+    """One monotonic launch gate shared by all workers and retry attempts."""
+    def __init__(self,interval=1.0,clock=None,sleeper=None,stop_event=None):
+        self.interval=interval;self.clock=clock or time.monotonic
+        self.sleeper=sleeper;self.stop_event=stop_event or ACCESS_STOPPED
+        self.lock=threading.RLock();self.next_allowed=0.0
+    def wait(self):
+        with self.lock:
+            if self.stop_event.is_set():raise RuntimeError('SOURCE_COLLECTION_ABORTED_AFTER_TERMINAL_ERROR')
+            delay=max(0.0,self.next_allowed-self.clock())
+            if delay:
+                if self.sleeper:self.sleeper(delay)
+                elif self.stop_event.wait(delay):raise RuntimeError('SOURCE_COLLECTION_ABORTED_AFTER_TERMINAL_ERROR')
+            if self.stop_event.is_set():raise RuntimeError('SOURCE_COLLECTION_ABORTED_AFTER_TERMINAL_ERROR')
+            self.next_allowed=self.clock()+self.interval
+    def defer(self,seconds):
+        with self.lock:self.next_allowed=max(self.next_allowed,self.clock()+seconds)
+    def execute(self,operation,on_error=lambda error:None):
+        # Hold the launch gate until HTTP headers arrive. An HTTP error's
+        # origin-wide pause/stop is installed before another worker may launch.
+        with self.lock:
+            self.wait()
+            try:return operation()
+            except Exception as error:on_error(error);raise
+
+REQUEST_LIMITER=RequestLimiter()
+
 class SourceStageError(RuntimeError):
     def __init__(self,stage,url,cause):
         self.stage,self.url,self.cause=stage,url,cause
@@ -48,21 +75,29 @@ def retry_seconds(value,attempt):
 def fetch(url):
     for attempt in range(4):
         if ACCESS_STOPPED.is_set():raise RuntimeError('SOURCE_COLLECTION_ABORTED_AFTER_TERMINAL_ERROR')
+        def observe_error(error):
+            if not isinstance(error,HTTPError):return
+            if error.code==403:
+                ACCESS_STOPPED.set()
+                diagnostic({'error_stage':'http_fetch','http_status':403,'error_class':'HTTPError','source_url':url,'action':'abort_collection_no_bypass'})
+            elif error.code in (429,500,502,503,504) and attempt<3:
+                delay=retry_seconds(error.headers.get('Retry-After'),attempt)
+                error.ncl_retry_seconds=delay
+                diagnostic({'error_stage':'http_fetch','http_status':error.code,'error_class':'HTTPError','source_url':url,'attempt':attempt+1,'retry_after_seconds':delay})
+                if delay>300:ACCESS_STOPPED.set()
+                else:REQUEST_LIMITER.defer(delay)
+            else:ACCESS_STOPPED.set()
         try:
             req=Request(url,headers={'Accept':'application/json','User-Agent':'CruiseItinerarySourceCheck/1.0'})
-            with urlopen(req,timeout=70) as res:
+            with REQUEST_LIMITER.execute(lambda:urlopen(req,timeout=70),observe_error) as res:
                 if res.status != 200: raise RuntimeError('HTTP '+str(res.status))
                 return json.load(res)
         except HTTPError as e:
             if e.code==403:
-                ACCESS_STOPPED.set()
-                diagnostic({'error_stage':'http_fetch','http_status':403,'error_class':'HTTPError','source_url':url,'action':'abort_collection_no_bypass'})
                 raise
             if e.code not in (429,500,502,503,504) or attempt==3: raise
-            delay=retry_seconds(e.headers.get('Retry-After'),attempt)
-            diagnostic({'error_stage':'http_fetch','http_status':e.code,'error_class':'HTTPError','source_url':url,'attempt':attempt+1,'retry_after_seconds':delay})
+            delay=e.ncl_retry_seconds
             if delay>300:raise RuntimeError('SOURCE_RETRY_AFTER_EXCEEDS_JOB_BUDGET') from e
-            time.sleep(delay)
         except Exception:
             if attempt==3: raise
             time.sleep(attempt+1)
