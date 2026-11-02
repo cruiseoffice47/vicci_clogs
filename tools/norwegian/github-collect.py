@@ -48,13 +48,14 @@ def main(argv=None):
     parser.add_argument('--output',type=Path,default=Path('data/norwegian-sailings.json'))
     parser.add_argument('--offline-source',type=Path,help='Local QA only; the production workflow never sets this')
     parser.add_argument('--as-of',help='Local historical offline QA only')
+    parser.add_argument('--workers',type=int,default=4,choices=range(1,5),help='Ordinary collection concurrency; reduce only when evidence warrants pacing')
     args=parser.parse_args(argv)
     if args.as_of and not args.offline_source:parser.error('--as-of requires offline QA source')
     run_temp=Path(os.environ.get('RUNNER_TEMP',str(HERE/'norwegian-refresh-next')))
     refresh.CANDIDATES=run_temp/'norwegian-candidate-runs'
     refresh.CANDIDATES.mkdir(parents=True,exist_ok=True)
     before={p for p in refresh.CANDIDATES.iterdir() if p.is_dir()}
-    command=['collect']
+    command=['collect','--workers',str(args.workers)]
     if args.offline_source:
         command=['preflight','--source',str(args.offline_source.resolve())]
         if args.as_of:command+=['--as-of',args.as_of]

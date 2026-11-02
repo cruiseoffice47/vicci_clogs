@@ -1,7 +1,8 @@
 """Anonymous, read-only extraction from the exact APIs used by ncl.com.
 No pricing/customer fields are retained. No cloud or booking writes occur.
 """
-import argparse, concurrent.futures as cf, datetime as dt, hashlib, json, re, subprocess, time
+import argparse, concurrent.futures as cf, datetime as dt, hashlib, json, re, subprocess, threading, time
+from email.utils import parsedate_to_datetime
 from collections import defaultdict
 from pathlib import Path
 from urllib.parse import urlencode, quote
@@ -13,17 +14,55 @@ CODE_ROOT=Path(__file__).resolve().parent
 ROOT=CODE_ROOT
 CACHE=ROOT/'norwegian-source-cache'
 CACHE.mkdir(exist_ok=True)
+ACCESS_STOPPED=threading.Event()
+DIAGNOSTIC_LOCK=threading.Lock()
+DIAGNOSTIC_COUNT=0
+
+class SourceStageError(RuntimeError):
+    def __init__(self,stage,url,cause):
+        self.stage,self.url,self.cause=stage,url,cause
+        super().__init__(type(cause).__name__+': '+str(cause)[:240])
+
+def error_details(error):
+    cause=error.cause if isinstance(error,SourceStageError) else error
+    return {'error_stage':getattr(error,'stage','source_collection'),
+      'error_class':type(cause).__name__,'http_status':getattr(cause,'code',None),
+      'reason':re.sub(r'[\r\n]+',' ',str(cause))[:240]}
+
+def diagnostic(details):
+    global DIAGNOSTIC_COUNT
+    with DIAGNOSTIC_LOCK:
+        if DIAGNOSTIC_COUNT<12:
+            print('SOURCE_DIAGNOSTIC '+json.dumps(details,ensure_ascii=True),flush=True)
+        DIAGNOSTIC_COUNT+=1
+
+def retry_seconds(value,attempt):
+    text=str(value or '').strip()
+    if re.fullmatch(r'\d+(?:\.\d+)?',text):return float(text)
+    try:
+        when=parsedate_to_datetime(text)
+        if when.tzinfo is None:when=when.replace(tzinfo=dt.timezone.utc)
+        return max(0,(when-dt.datetime.now(dt.timezone.utc)).total_seconds())
+    except (ValueError,TypeError,OverflowError):return 2*(attempt+1)
 
 def fetch(url):
     for attempt in range(4):
+        if ACCESS_STOPPED.is_set():raise RuntimeError('SOURCE_COLLECTION_ABORTED_AFTER_TERMINAL_ERROR')
         try:
             req=Request(url,headers={'Accept':'application/json','User-Agent':'CruiseItinerarySourceCheck/1.0'})
             with urlopen(req,timeout=70) as res:
                 if res.status != 200: raise RuntimeError('HTTP '+str(res.status))
                 return json.load(res)
         except HTTPError as e:
+            if e.code==403:
+                ACCESS_STOPPED.set()
+                diagnostic({'error_stage':'http_fetch','http_status':403,'error_class':'HTTPError','source_url':url,'action':'abort_collection_no_bypass'})
+                raise
             if e.code not in (429,500,502,503,504) or attempt==3: raise
-            time.sleep(min(20,float(e.headers.get('Retry-After','2'))*(attempt+1)))
+            delay=retry_seconds(e.headers.get('Retry-After'),attempt)
+            diagnostic({'error_stage':'http_fetch','http_status':e.code,'error_class':'HTTPError','source_url':url,'attempt':attempt+1,'retry_after_seconds':delay})
+            if delay>300:raise RuntimeError('SOURCE_RETRY_AFTER_EXCEEDS_JOB_BUDGET') from e
+            time.sleep(delay)
         except Exception:
             if attempt==3: raise
             time.sleep(attempt+1)
@@ -177,7 +216,9 @@ def main():
     candidates=[]
     def sailings(itinerary):
         url=BASE+'/api/vacations/sailings/'+quote(itinerary['code'],safe='')+'?'+urlencode({'dates':dates})
-        raw=fetch(url); unique={}
+        try: raw=fetch(url)
+        except Exception as e:raise SourceStageError('sailings_fetch',url,e) from e
+        unique={}
         for row in raw.get('pricingStateRooms',[]):
             start,end=iso(row.get('sailStartDate')),iso(row.get('sailEndDate'))
             if not(start and end and args.start<=start<=args.end) or row.get('isFlyCruise') or row.get('isPackage'): continue
@@ -189,22 +230,34 @@ def main():
         jobs={pool.submit(sailings,r):r['code'] for r in routes.values()}
         for i,job in enumerate(cf.as_completed(jobs),1):
             try: candidates.extend(job.result())
-            except Exception as e: failures.append({'stage':'sailings','code':jobs[job],'error':str(e)})
+            except Exception as e:
+                failure={'stage':'sailings','code':jobs[job],**error_details(e)}
+                failures.append(failure);diagnostic(failure)
+                ACCESS_STOPPED.set()
+                for pending in jobs:pending.cancel()
+                break
             if i%25==0 or i==len(jobs): print(f'SAILINGS routes={i}/{len(jobs)} candidates={len(candidates)} errors={len(failures)}',flush=True)
+    if failures:raise RuntimeError('SOURCE_SAILINGS_STAGE_FAILED_NO_PROMOTION')
     candidate_map={(r['code'],str(s['packageId']),iso(s['sailStartDate']),iso(s['sailEndDate'])):(r,s) for r,s in candidates}
     records=[]
     def detail(pair):
         route,sailing=pair; url=BASE+'/api/vacations/events/'+quote(route['code'],safe='')+'/package/'+quote(str(sailing['packageId']),safe='')
-        raw=fetch(url)
-        return record(route,sailing,raw,checked,url)
+        try: raw=fetch(url)
+        except Exception as e:raise SourceStageError('events_fetch',url,e) from e
+        try:return record(route,sailing,raw,checked,url)
+        except Exception as e:raise SourceStageError('events_parse',url,e) from e
     with cf.ThreadPoolExecutor(max_workers=args.workers) as pool:
         jobs={pool.submit(detail,pair):pair for pair in candidate_map.values()}
         for i,job in enumerate(cf.as_completed(jobs),1):
             try: records.append(job.result())
             except Exception as e:
-                route,sailing=jobs[job]; failures.append({'stage':'events','code':route['code'],'package_id':str(sailing['packageId']),'error':str(e)})
-                url=BASE+'/api/vacations/events/'+quote(route['code'],safe='')+'/package/'+str(sailing['packageId'])
-                records.append(record(route,sailing,{},checked,url,'SOURCE_DETAIL_FETCH_FAILED'))
+                route,sailing=jobs[job]
+                ship=route.get('ship');ship=ship.get('title','') if isinstance(ship,dict) else str(ship)[:100]
+                failure={'stage':'events','ship':ship,'code':route['code'],'package_id':str(sailing['packageId']),**error_details(e)}
+                failures.append(failure);diagnostic(failure)
+                ACCESS_STOPPED.set()
+                for pending in jobs:pending.cancel()
+                break
             if i%50==0 or i==len(jobs): print(f'EVENTS sailings={i}/{len(jobs)} errors={len(failures)}',flush=True)
     # Collapse only EXACT identity+dates+published plan duplicates, keeping lineage.
     dedup={}
