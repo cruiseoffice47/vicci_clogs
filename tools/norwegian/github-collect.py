@@ -10,6 +10,7 @@ from zoneinfo import ZoneInfo
 HERE=Path(__file__).resolve().parent
 # Explicit deployment ceiling from reviewed current master headroom; Google also recounts live other sources.
 MAX_PUBLISHED_NCL_RECORDS=3181
+MAX_PUBLISHED_SNAPSHOT_BYTES=20_000_000
 spec=importlib.util.spec_from_file_location('ncl_refresh',HERE/'norwegian-refresh.py')
 refresh=importlib.util.module_from_spec(spec);spec.loader.exec_module(refresh)
 
@@ -17,6 +18,8 @@ def promote_candidate(candidate,output,offline=False):
     proof=json.loads((candidate/'refresh-proof.json').read_text(encoding='utf-8'))
     source=json.loads((candidate/'norwegian-source-records.json').read_text(encoding='utf-8'))
     payload=(candidate/'drive-snapshot.json').read_bytes()
+    if not 0 < len(payload) <= MAX_PUBLISHED_SNAPSHOT_BYTES:
+        raise RuntimeError('PUBLIC_SNAPSHOT_BYTE_LIMIT_EXCEEDED')
     digest=hashlib.sha256(payload).hexdigest()
     if proof.get('preflight_passed') is not True or proof.get('hashes',{}).get('transport_snapshot_sha256')!=digest:
         raise RuntimeError('TRANSPORT_PROOF_BINDING_MISMATCH')
