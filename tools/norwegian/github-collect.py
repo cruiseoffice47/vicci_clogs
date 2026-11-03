@@ -8,6 +8,8 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 HERE=Path(__file__).resolve().parent
+# Explicit deployment ceiling from reviewed current master headroom; Google also recounts live other sources.
+MAX_PUBLISHED_NCL_RECORDS=3181
 spec=importlib.util.spec_from_file_location('ncl_refresh',HERE/'norwegian-refresh.py')
 refresh=importlib.util.module_from_spec(spec);spec.loader.exec_module(refresh)
 
@@ -23,6 +25,8 @@ def promote_candidate(candidate,output,offline=False):
     snapshot=json.loads(payload)
     if snapshot['source_fetch_complete'] is not True or snapshot['failures'] or snapshot['record_count']!=proof['validation']['records']:
         raise RuntimeError('PUBLIC_SNAPSHOT_COMPLETENESS_MISMATCH')
+    if not 0 < snapshot['record_count'] <= MAX_PUBLISHED_NCL_RECORDS:
+        raise RuntimeError('PUBLIC_NCL_RECORD_LIMIT_EXCEEDED')
     checked=dt.datetime.fromisoformat(snapshot['checked_at'].replace('Z','+00:00'))
     if checked.tzinfo is None or checked.astimezone(ZoneInfo('America/New_York')).date().isoformat()!=snapshot['window_start']:
         raise RuntimeError('SNAPSHOT_CHECKED_DATE_WINDOW_MISMATCH')

@@ -10,10 +10,12 @@ from zoneinfo import ZoneInfo
 
 CODE_ROOT=Path(__file__).resolve().parent
 CANDIDATES=CODE_ROOT/'norwegian-refresh-next'
+HORIZON_MONTHS=24
 
 def rolling_window(as_of=None):
     today=dt.date.fromisoformat(as_of) if as_of else dt.datetime.now(ZoneInfo('America/New_York')).date()
-    year=today.year+1
+    if HORIZON_MONTHS not in (12,24): raise ValueError("UNSUPPORTED_HORIZON_MONTHS")
+    year=today.year+HORIZON_MONTHS//12
     end=dt.date(year,today.month,min(today.day,calendar.monthrange(year,today.month)[1]))
     return {'start':today.isoformat(),'end_exclusive':end.isoformat(),'end_inclusive':(end-dt.timedelta(days=1)).isoformat()}
 
